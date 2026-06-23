@@ -28,6 +28,7 @@ RUN cargo build --release --bin server
 
 # Stage 3: Slim Runner
 FROM debian:bookworm-slim AS runner
+LABEL org.opencontainers.image.source="https://github.com/UberMetroid/rustle"
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 # Copy compiled server binary and compiled static assets
