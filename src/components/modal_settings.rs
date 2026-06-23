@@ -94,6 +94,8 @@ pub struct SettingsModalProps {
     pub handle_dark_mode: Callback<bool>,
     pub is_high_contrast_mode: bool,
     pub handle_high_contrast_mode: Callback<bool>,
+    pub is_military_theme: bool,
+    pub handle_military_theme: Callback<bool>,
 }
 
 #[function_component(SettingsModal)]
@@ -117,6 +119,12 @@ pub fn settings_modal(props: &SettingsModalProps) -> Html {
                     flag={props.is_high_contrast_mode}
                     handle_flag={props.handle_high_contrast_mode.clone()}
                     description={Some(HIGH_CONTRAST_MODE_DESCRIPTION.to_string())}
+                />
+                <SettingsToggle
+                    setting_name="Sci-Fi Military Theme"
+                    flag={props.is_military_theme}
+                    handle_flag={props.handle_military_theme.clone()}
+                    description={Some("Enable green-phosphor retro terminal colors".to_string())}
                 />
             </div>
         </BaseModal>

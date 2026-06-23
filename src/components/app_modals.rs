@@ -81,6 +81,7 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                         is_dark_mode: state.is_dark_mode,
                         is_high_contrast: state.is_high_contrast,
                         is_hard_mode: val,
+                        is_military_theme: state.is_military_theme,
                     },
                 );
             } else {
@@ -102,6 +103,7 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                     is_dark_mode: val,
                     is_high_contrast: state.is_high_contrast,
                     is_hard_mode: state.is_hard_mode,
+                    is_military_theme: state.is_military_theme,
                 },
             );
         })
@@ -116,6 +118,22 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                     is_dark_mode: state.is_dark_mode,
                     is_high_contrast: val,
                     is_hard_mode: state.is_hard_mode,
+                    is_military_theme: state.is_military_theme,
+                },
+            );
+        })
+    };
+
+    let handle_military_theme = {
+        let state = state.clone();
+        Callback::from(move |val| {
+            state.dispatch(Action::SetMilitaryTheme(val));
+            crate::helpers::local_storage::save_preferences_to_local_storage(
+                &crate::helpers::local_storage::StoredPreferences {
+                    is_dark_mode: state.is_dark_mode,
+                    is_high_contrast: state.is_high_contrast,
+                    is_hard_mode: state.is_hard_mode,
+                    is_military_theme: val,
                 },
             );
         })
@@ -143,6 +161,8 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                 handle_dark_mode={handle_dark_mode}
                 is_high_contrast_mode={state.is_high_contrast}
                 handle_high_contrast_mode={handle_high_contrast}
+                is_military_theme={state.is_military_theme}
+                handle_military_theme={handle_military_theme}
             />
 
             <StatsModal

@@ -60,27 +60,35 @@ pub fn use_app_effects(
         });
     }
 
-    // Toggle document element classes for Dark mode and High Contrast themes
+    // Toggle document element classes for Dark mode, High Contrast, and Military themes
     {
         let dark = state.is_dark_mode;
         let contrast = state.is_high_contrast;
-        use_effect_with((dark, contrast), move |&(dark, contrast)| {
-            if let Some(win) = web_sys::window() {
-                if let Some(doc) = win.document() {
-                    if let Some(el) = doc.document_element() {
-                        let class_list = el.class_list();
-                        let _ = class_list.remove_1("dark");
-                        let _ = class_list.remove_1("high-contrast");
-                        if dark {
-                            let _ = class_list.add_1("dark");
-                        }
-                        if contrast {
-                            let _ = class_list.add_1("high-contrast");
+        let military = state.is_military_theme;
+        use_effect_with(
+            (dark, contrast, military),
+            move |&(dark, contrast, military)| {
+                if let Some(win) = web_sys::window() {
+                    if let Some(doc) = win.document() {
+                        if let Some(el) = doc.document_element() {
+                            let class_list = el.class_list();
+                            let _ = class_list.remove_1("dark");
+                            let _ = class_list.remove_1("high-contrast");
+                            let _ = class_list.remove_1("military");
+                            if dark {
+                                let _ = class_list.add_1("dark");
+                            }
+                            if contrast {
+                                let _ = class_list.add_1("high-contrast");
+                            }
+                            if military {
+                                let _ = class_list.add_1("military");
+                            }
                         }
                     }
                 }
-            }
-        });
+            },
+        );
     }
 
     // Clear jiggle animation class after duration has run

@@ -291,3 +291,98 @@ svg.cursor-pointer:hover {
 .react-datepicker__day--range-end {
   @apply bg-indigo-600 text-white hover:bg-white hover:text-gray-700;
 }
+
+/* 80s Sci-Fi Military Theme (Phosphor Green Terminal) */
+.military {
+  color-scheme: dark;
+}
+
+.military body,
+.military .bg-white,
+.military .dark\:bg-slate-900,
+.military .bg-slate-900,
+.military .bg-white.dark\:bg-slate-900 {
+  background-color: #050d06 !important;
+  color: #33ff33 !important;
+  font-family: 'Courier New', Courier, monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas !important;
+}
+
+/* Navbar & Text Color Overrides */
+.military p,
+.military h1,
+.military h2,
+.military h3,
+.military span,
+.military button,
+.military div {
+  color: #33ff33 !important;
+}
+
+.military svg {
+  stroke: #33ff33 !important;
+}
+
+/* Grid cells override */
+.military .border-slate-200,
+.military .dark\:border-slate-600,
+.military .border-black,
+.military .dark\:border-slate-100 {
+  border-color: #15381a !important;
+  background-color: #071208 !important;
+}
+
+/* Cell/Key states */
+/* Correct: glowing green border, dark green background */
+.military .correct,
+.military .bg-green-500,
+.military .bg-orange-500 {
+  background-color: #103816 !important;
+  border-color: #33ff33 !important;
+  color: #33ff33 !important;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.6) !important;
+}
+
+/* Present: glowing amber border, dark amber background */
+.military .present,
+.military .bg-yellow-500,
+.military .bg-cyan-500 {
+  background-color: #332103 !important;
+  border-color: #ffaa00 !important;
+  color: #ffaa00 !important;
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.6) !important;
+}
+
+/* Absent: dim gray-green border, darker background, dim text */
+.military .absent,
+.military .bg-slate-400,
+.military .dark\:bg-slate-800,
+.military .bg-slate-800 {
+  background-color: #080f09 !important;
+  border-color: #132416 !important;
+  color: #17381d !important;
+}
+
+/* Unused/default keys */
+.military .bg-slate-200,
+.military .dark\:bg-slate-600 {
+  background-color: #081209 !important;
+  border: 1px solid #15381a !important;
+  color: #2bd82b !important;
+}
+
+.military .hover\:bg-slate-300:hover,
+.military .dark\:hover\:bg-slate-600:hover {
+  background-color: #132e18 !important;
+}
+
+/* Dialogs / Modals */
+.military .bg-white,
+.military .dark\:bg-slate-900 {
+  border: 2px solid #33ff33 !important;
+  box-shadow: 0 0 20px rgba(51, 255, 51, 0.4) !important;
+}
+
+.military .divide-y > * + * {
+  border-color: #15381a !important;
+}
+

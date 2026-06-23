@@ -121,6 +121,8 @@ pub struct StoredPreferences {
     pub is_dark_mode: bool,
     pub is_high_contrast: bool,
     pub is_hard_mode: bool,
+    #[serde(default)]
+    pub is_military_theme: bool,
 }
 
 pub fn save_preferences_to_local_storage(prefs: &StoredPreferences) {
@@ -152,6 +154,8 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
     let mut is_dark_mode = prefers_dark;
     #[allow(unused_mut)]
     let mut is_hard_mode = false;
+    #[allow(unused_mut)]
+    let mut is_military_theme = false;
     #[cfg(target_arch = "wasm32")]
     if let Some(win) = web_sys::window() {
         if let Ok(Some(storage)) = win.local_storage() {
@@ -167,6 +171,7 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
         is_dark_mode,
         is_high_contrast,
         is_hard_mode,
+        is_military_theme,
     }
 }
 

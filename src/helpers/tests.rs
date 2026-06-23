@@ -101,6 +101,7 @@ fn test_persistence_game_state_and_preferences() {
         is_dark_mode: true,
         is_high_contrast: false,
         is_hard_mode: true,
+        is_military_theme: false,
     };
     save_preferences_to_local_storage(&prefs);
 

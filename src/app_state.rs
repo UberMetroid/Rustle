@@ -39,6 +39,7 @@ pub struct AppState {
     pub is_dark_mode: bool,
     pub is_high_contrast: bool,
     pub is_hard_mode: bool,
+    pub is_military_theme: bool,
 }
 
 pub enum Action {
@@ -61,6 +62,7 @@ pub enum Action {
     SetHardMode(bool),
     SetDarkMode(bool),
     SetHighContrast(bool),
+    SetMilitaryTheme(bool),
 }
 
 impl Reducible for AppState {
@@ -128,6 +130,9 @@ impl Reducible for AppState {
             Action::SetHighContrast(val) => {
                 state.is_high_contrast = val;
             }
+            Action::SetMilitaryTheme(val) => {
+                state.is_military_theme = val;
+            }
         }
         Rc::new(state)
     }
@@ -156,6 +161,7 @@ impl AppState {
         let is_dark_mode = prefs.is_dark_mode;
         let is_hard_mode = prefs.is_hard_mode;
         let is_high_contrast = prefs.is_high_contrast;
+        let is_military_theme = prefs.is_military_theme;
 
         let game_stats = crate::helpers::stats::load_stats();
 
@@ -178,6 +184,7 @@ impl AppState {
             is_dark_mode,
             is_high_contrast,
             is_hard_mode,
+            is_military_theme,
         }
     }
 }
