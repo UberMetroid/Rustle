@@ -1,21 +1,36 @@
 # Rustle
 
-An optimized, containerized Rust + WebAssembly (Yew) Wordle clone.
+An optimized Rust + WebAssembly (Yew) Wordle clone.
 
-## Container Deployment
+## Run Game
 
-### 1. Build Production Image
-Build the multi-stage, optimized WASM Docker image using the standalone Tailwind CSS compiler:
+### 1. Prerequisites
+Ensure you have the Rust toolchain, WASM target, and Trunk compiler installed:
 ```bash
-docker build -t ubermetroid/rustle:latest -f docker/Dockerfile .
+# Add WebAssembly target
+rustup target add wasm32-unknown-unknown
+
+# Install Trunk compiler
+cargo install --locked trunk
+
+# Install Standalone Tailwind CSS v3 CLI
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64
+chmod +x tailwindcss-linux-x64
+mv tailwindcss-linux-x64 ~/.cargo/bin/tailwindcss
 ```
 
-### 2. Run Container
-Launch the lightweight Nginx server hosting the WASM app under a secure, non-root user:
+### 2. Compile and Serve
+Start the server locally on port `4409` (configured inside `Trunk.toml`):
 ```bash
-docker run -d -p 4409:4409 --name rustle-game ubermetroid/rustle:latest
+trunk serve
 ```
 Open [http://localhost:4409](http://localhost:4409) to play.
+
+### 3. Production Build
+Generate optimized release artifacts in the `/dist` directory:
+```bash
+trunk build --release
+```
 
 ## File Tree
 
