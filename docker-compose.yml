@@ -1,0 +1,20 @@
+services:
+  rustle:
+    image: ubermetroid/rustle:latest
+    build: .
+    container_name: rustle
+    restart: unless-stopped
+    ports:
+      - ${RUSTLE_PORT:-4409}:4409
+    environment:
+      PORT: 4409
+      # The title shown in the web interface
+      SITE_TITLE: ${RUSTLE_SITE_TITLE:-Rustle}
+      # Optional PIN protection (leave empty to disable)
+      RUSTLE_PIN: ${RUSTLE_PIN:-}
+      # The base URL for the application
+      BASE_URL: ${RUSTLE_BASE_URL:-http://localhost:4409}
+      # CORS Allowed Origins
+      ALLOWED_ORIGINS: ${RUSTLE_ALLOWED_ORIGINS:-*}
+      # Timezone
+      TZ: ${TZ:-UTC}

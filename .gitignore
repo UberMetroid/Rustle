@@ -13,3 +13,6 @@
 *.njsproj
 *.sln
 *.sw?
+
+# Local environment configuration
+.env
