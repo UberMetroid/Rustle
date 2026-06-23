@@ -35,9 +35,9 @@ mod tests {
     /// Validates that embedded word lists are not empty during build testing.
     #[test]
     fn test_word_list_embeddings() {
-        assert!(WORDS.len() > 0, "Solutions list cannot be empty");
+        assert!(!WORDS.is_empty(), "Solutions list cannot be empty");
         assert!(
-            VALID_GUESSES.len() > 0,
+            !VALID_GUESSES.is_empty(),
             "Valid guesses list cannot be empty"
         );
         assert_eq!(
