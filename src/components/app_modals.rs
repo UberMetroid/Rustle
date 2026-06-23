@@ -70,79 +70,74 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
         })
     };
 
-    let handle_hard_mode = {
-        let state = state.clone();
-        let show_alert = show_alert.clone();
-        Callback::from(move |val| {
-            if state.guesses.is_empty() {
-                state.dispatch(Action::SetHardMode(val));
-                crate::helpers::local_storage::save_preferences_to_local_storage(
-                    &crate::helpers::local_storage::StoredPreferences {
-                        is_dark_mode: state.is_dark_mode,
-                        is_high_contrast: state.is_high_contrast,
-                        is_hard_mode: val,
-                        is_military_theme: state.is_military_theme,
-                    },
-                );
-            } else {
-                show_alert.emit((
-                    HARD_MODE_ALERT_MESSAGE.to_string(),
-                    "error".to_string(),
-                    ALERT_TIME_MS,
-                ));
-            }
-        })
-    };
-
     let save_prefs = {
         let state = state.clone();
-        move |dark: bool, contrast: bool, military: bool| {
+        move |dark: bool, contrast: bool, military: bool, hard: bool| {
             state.dispatch(Action::SetDarkMode(dark));
             state.dispatch(Action::SetHighContrast(contrast));
             state.dispatch(Action::SetMilitaryTheme(military));
+            state.dispatch(Action::SetHardMode(hard));
             crate::helpers::local_storage::save_preferences_to_local_storage(
                 &crate::helpers::local_storage::StoredPreferences {
                     is_dark_mode: dark,
                     is_high_contrast: contrast,
-                    is_hard_mode: state.is_hard_mode,
+                    is_hard_mode: hard,
                     is_military_theme: military,
                 },
             );
         }
     };
 
-    let handle_dark_mode = {
+    let handle_hard_mode = {
         let state = state.clone();
+        let show_alert = show_alert.clone();
         let save_prefs = save_prefs.clone();
         Callback::from(move |val| {
             if val {
-                save_prefs(true, false, false);
+                if state.guesses.is_empty() {
+                    save_prefs(false, false, false, true);
+                } else {
+                    show_alert.emit((
+                        HARD_MODE_ALERT_MESSAGE.to_string(),
+                        "error".to_string(),
+                        ALERT_TIME_MS,
+                    ));
+                }
             } else {
-                save_prefs(false, state.is_high_contrast, state.is_military_theme);
+                save_prefs(false, false, false, false);
+            }
+        })
+    };
+
+    let handle_dark_mode = {
+        let save_prefs = save_prefs.clone();
+        Callback::from(move |val| {
+            if val {
+                save_prefs(true, false, false, false);
+            } else {
+                save_prefs(false, false, false, false);
             }
         })
     };
 
     let handle_high_contrast = {
-        let state = state.clone();
         let save_prefs = save_prefs.clone();
         Callback::from(move |val| {
             if val {
-                save_prefs(false, true, false);
+                save_prefs(false, true, false, false);
             } else {
-                save_prefs(state.is_dark_mode, false, state.is_military_theme);
+                save_prefs(false, false, false, false);
             }
         })
     };
 
     let handle_military_theme = {
-        let state = state.clone();
         let save_prefs = save_prefs.clone();
         Callback::from(move |val| {
             if val {
-                save_prefs(false, false, true);
+                save_prefs(false, false, true, false);
             } else {
-                save_prefs(state.is_dark_mode, state.is_high_contrast, false);
+                save_prefs(false, false, false, false);
             }
         })
     };
