@@ -1,18 +1,29 @@
-# Rust and Trunk WASM build outputs
-/target
-/dist
+# Rust build artifacts
+target/
+**/target/
 
-# OS files
-.DS_Store
+# Trunk build artifacts
+dist/
+frontend/dist/
+frontend/target/
 
-# IDE configuration files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Local environment configuration
+# Local configuration
 .env
+.env.local
+.env.*.local
+
+# Local databases and user data
+data/
+uploads/
+local_uploads/
+
+# IDE/Editor config
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+
+# OS specific files
+.DS_Store
+Thumbs.db
