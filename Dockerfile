@@ -14,6 +14,8 @@ RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4
     mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
 
 COPY . .
+RUN trunk --version
+RUN tailwindcss --help
 RUN trunk build --release
 
 # Stage 2: Build the Axum server backend
