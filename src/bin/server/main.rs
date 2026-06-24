@@ -34,7 +34,7 @@ use std::net::SocketAddr;
 use tower_http::services::{ServeDir, ServeFile};
 
 #[cfg(not(target_arch = "wasm32"))]
-use auth::{auth_check, auth_middleware, logout, pin_required, verify_pin, AppState};
+use auth::{auth_check, auth_middleware, logout, pin_required, verify_pin, AppState, security_headers_middleware};
 #[cfg(not(target_arch = "wasm32"))]
 use handlers::{serve_asset_manifest, serve_index, serve_service_worker};
 
@@ -93,6 +93,7 @@ async fn run() {
             auth_middleware,
         ))
         .layer(cors)
+        .layer(middleware::from_fn(security_headers_middleware))
         .with_state(app_state.clone());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
