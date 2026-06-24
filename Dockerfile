@@ -26,7 +26,7 @@ COPY --from=frontend-builder /app/frontend/dist /app/dist
 RUN cargo build --release --bin server
 
 # Stage 3: Slim Runner
-FROM alpine:3.18
+FROM alpine:latest
 LABEL org.opencontainers.image.source="https://github.com/UberMetroid/rustle"
 WORKDIR /app
 
