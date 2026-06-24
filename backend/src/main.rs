@@ -7,40 +7,24 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Rustle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-#[cfg(not(target_arch = "wasm32"))]
 pub mod auth;
-#[cfg(not(target_arch = "wasm32"))]
 pub mod handlers;
-#[cfg(not(target_arch = "wasm32"))]
 pub mod utils;
 
-#[cfg(not(target_arch = "wasm32"))]
 use axum::{
     middleware,
     routing::{get, post},
     Router,
 };
-#[cfg(not(target_arch = "wasm32"))]
 use std::net::SocketAddr;
-#[cfg(not(target_arch = "wasm32"))]
 use tower_http::services::{ServeDir, ServeFile};
 
-#[cfg(not(target_arch = "wasm32"))]
 use auth::{auth_check, auth_middleware, logout, pin_required, verify_pin, AppState, security_headers_middleware};
-#[cfg(not(target_arch = "wasm32"))]
 use handlers::{serve_asset_manifest, serve_index, serve_service_worker};
 
-#[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
-async fn run() {
+async fn main() {
     dotenvy::dotenv().ok();
 
     // 1. Ports
@@ -103,7 +87,6 @@ async fn run() {
     axum::serve(listener, app).await.unwrap();
 }
 
-#[cfg(not(target_arch = "wasm32"))]
 fn get_cors_layer(allowed_origins_env: &str) -> tower_http::cors::CorsLayer {
     use axum::http::HeaderValue;
     use tower_http::cors::Any;
@@ -128,9 +111,4 @@ fn get_cors_layer(allowed_origins_env: &str) -> tower_http::cors::CorsLayer {
             .allow_methods(Any)
             .allow_headers(Any)
     }
-}
-
-fn main() {
-    #[cfg(not(target_arch = "wasm32"))]
-    run();
 }

@@ -16,7 +16,7 @@
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
 use axum::{
-    extract::State,
+    extract::{ConnectInfo, State},
     http::{header, HeaderMap, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
@@ -24,6 +24,10 @@ use axum::{
 };
 use serde::Deserialize;
 use serde_json::json;
+use std::net::SocketAddr;
+use std::collections::HashMap;
+use std::sync::{Mutex, OnceLock};
+use std::time::{Duration, Instant};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -41,17 +45,142 @@ pub struct VerifyPinPayload {
 // Embed premium Login HTML
 pub const LOGIN_HTML: &str = include_str!("login.html");
 
-pub async fn pin_required(State(state): State<AppState>) -> impl IntoResponse {
+const LOCKOUT_DURATION: Duration = Duration::from_secs(15 * 60);
+
+#[derive(Debug, Clone)]
+struct Attempt {
+    count: u32,
+    last_attempt: Instant,
+}
+
+fn login_attempts() -> &'static Mutex<HashMap<String, Attempt>> {
+    static ATTEMPTS: OnceLock<Mutex<HashMap<String, Attempt>>> = OnceLock::new();
+    ATTEMPTS.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+pub fn get_max_attempts() -> u32 {
+    std::env::var("MAX_ATTEMPTS")
+        .ok()
+        .and_then(|val| val.parse().ok())
+        .unwrap_or(5)
+}
+
+pub fn is_locked_out(ip: &str) -> bool {
+    if let Ok(mut attempts) = login_attempts().lock() {
+        if let Some(attempt) = attempts.get(ip) {
+            if attempt.count >= get_max_attempts() {
+                if attempt.last_attempt.elapsed() < LOCKOUT_DURATION {
+                    return true;
+                }
+                attempts.remove(ip);
+            }
+        }
+    }
+    false
+}
+
+pub fn record_attempt(ip: &str) {
+    if let Ok(mut attempts) = login_attempts().lock() {
+        let now = Instant::now();
+        let attempt = attempts.entry(ip.to_string()).or_insert(Attempt {
+            count: 0,
+            last_attempt: now,
+        });
+        attempt.count += 1;
+        attempt.last_attempt = now;
+    }
+}
+
+pub fn reset_attempts(ip: &str) {
+    if let Ok(mut attempts) = login_attempts().lock() {
+        attempts.remove(ip);
+    }
+}
+
+pub fn get_lockout_time_remaining(ip: &str) -> u64 {
+    if let Ok(attempts) = login_attempts().lock() {
+        if let Some(attempt) = attempts.get(ip) {
+            let elapsed = attempt.last_attempt.elapsed();
+            if elapsed < LOCKOUT_DURATION {
+                let remaining = LOCKOUT_DURATION - elapsed;
+                return remaining.as_secs();
+            }
+        }
+    }
+    0
+}
+
+pub fn get_client_ip(headers: &HeaderMap, addr: SocketAddr) -> String {
+    if let Some(cf_connecting_ip) = headers.get("cf-connecting-ip") {
+        if let Ok(ip) = cf_connecting_ip.to_str() {
+            return ip.to_string();
+        }
+    }
+    if let Some(x_forwarded_for) = headers.get("x-forwarded-for") {
+        if let Ok(ip_list) = x_forwarded_for.to_str() {
+            if let Some(ip) = ip_list.split(',').next() {
+                return ip.trim().to_string();
+            }
+        }
+    }
+    if let Some(x_real_ip) = headers.get("x-real-ip") {
+        if let Ok(ip) = x_real_ip.to_str() {
+            return ip.to_string();
+        }
+    }
+    addr.ip().to_string()
+}
+
+pub async fn pin_required(
+    headers: HeaderMap,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    let ip = get_client_ip(&headers, addr);
+    let locked = is_locked_out(&ip);
+    let lockout_seconds = get_lockout_time_remaining(&ip);
+    let attempts_left = if locked {
+        0
+    } else {
+        let mut attempts_count = 0;
+        if let Ok(attempts) = login_attempts().lock() {
+            attempts_count = attempts.get(&ip).map(|a| a.count).unwrap_or(0);
+        }
+        get_max_attempts().saturating_sub(attempts_count)
+    };
     Json(json!({
         "required": state.pin.is_some(),
         "length": state.pin.as_ref().map(|p| p.len()).unwrap_or(0),
+        "locked": locked,
+        "attempts_left": attempts_left,
+        "lockout_minutes": lockout_seconds.div_ceil(60),
     }))
 }
 
 pub async fn verify_pin(
     State(state): State<AppState>,
+    headers: HeaderMap,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
     Json(payload): Json<VerifyPinPayload>,
 ) -> impl IntoResponse {
+    let ip = get_client_ip(&headers, addr);
+
+    if is_locked_out(&ip) {
+        let remaining = get_lockout_time_remaining(&ip);
+        let minutes = remaining.div_ceil(60);
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({
+                "success": false,
+                "error": format!("Too many attempts. Please try again in {} minutes.", minutes),
+                "attempts_left": 0,
+                "locked": true,
+                "lockout_minutes": minutes,
+            })),
+        )
+            .into_response();
+    }
+
     let Some(ref config_pin) = state.pin else {
         let mut headers = HeaderMap::new();
         headers.insert(
@@ -73,22 +202,51 @@ pub async fn verify_pin(
     }
 
     if safe_compare(pin_str, config_pin) {
+        reset_attempts(&ip);
         let mut headers = HeaderMap::new();
         headers.insert(
             header::SET_COOKIE,
             header::HeaderValue::from_str(&format!(
                 "RUSTLE_PIN={}; Path=/; HttpOnly; SameSite=Strict",
                 hash_pin(pin_str)
-            ))
+               ))
             .unwrap(),
         );
         (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response()
     } else {
-        (
-            StatusCode::UNAUTHORIZED,
-            Json(json!({ "success": false, "error": "Invalid PIN" })),
-        )
-            .into_response()
+        record_attempt(&ip);
+        let locked = is_locked_out(&ip);
+        let mut attempts_count = 0;
+        if let Ok(attempts) = login_attempts().lock() {
+            attempts_count = attempts.get(&ip).map(|a| a.count).unwrap_or(0);
+        }
+        let left = get_max_attempts().saturating_sub(attempts_count);
+
+        if locked {
+            (
+                StatusCode::TOO_MANY_REQUESTS,
+                Json(json!({
+                    "success": false,
+                    "error": "Too many attempts. Please try again in 15 minutes.",
+                    "attempts_left": 0,
+                    "locked": true,
+                    "lockout_minutes": 15,
+                })),
+            )
+                .into_response()
+        } else {
+            (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({
+                    "success": false,
+                    "error": format!("Invalid PIN. {} attempts remaining.", left),
+                    "attempts_left": left,
+                    "locked": false,
+                    "lockout_minutes": 0,
+                })),
+            )
+                .into_response()
+        }
     }
 }
 

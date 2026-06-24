@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-use super::auth::{is_authorized, AppState, LOGIN_HTML};
-use super::utils::{build_asset_manifest, get_holiday_for_date};
+use crate::auth::{is_authorized, AppState, LOGIN_HTML};
+use crate::utils::{build_asset_manifest, get_holiday_for_date};
 use axum::{
     extract::{Query, State},
     http::{header, HeaderMap, StatusCode},

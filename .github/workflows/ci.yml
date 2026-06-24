@@ -74,10 +74,12 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build Trunk App (Production)
-        run: trunk build --release
+        run: |
+          cd frontend
+          trunk build --release
 
       - name: Run Tests
-        run: cargo test
+        run: cargo test --workspace
 
       - name: Build Server Binary
-        run: cargo build --release --bin server
+        run: cargo build --release --bin server --workspace

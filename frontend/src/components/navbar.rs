@@ -27,6 +27,8 @@ pub struct NavbarProps {
     pub on_hard_mode_click: Callback<()>,
     pub theme: String,
     pub on_theme_click: Callback<()>,
+    pub is_pin_required: bool,
+    pub on_logout: Callback<()>,
 }
 
 #[function_component(Navbar)]
@@ -38,6 +40,8 @@ pub fn navbar(props: &NavbarProps) -> Html {
     let hard_mode_click = props.on_hard_mode_click.clone();
     let theme = props.theme.clone();
     let theme_click = props.on_theme_click.clone();
+    let is_pin_required = props.is_pin_required;
+    let logout_click = props.on_logout.clone();
 
     let date = crate::helpers::words::get_game_date();
     let holiday_info = crate::helpers::holidays::get_holiday_for_date(date);
@@ -118,6 +122,17 @@ pub fn navbar(props: &NavbarProps) -> Html {
                             <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
                         </svg>
                     </button>
+                    {if is_pin_required {
+                        html! {
+                            <button class="ml-3 focus:outline-none" onclick={move |_| logout_click.emit(())} aria-label="Logout">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 cursor-pointer dark:stroke-white" title="Logout">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                                </svg>
+                            </button>
+                        }
+                    } else {
+                        html! {}
+                    }}
                 </div>
             </div>
             <hr />

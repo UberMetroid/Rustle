@@ -52,10 +52,10 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
 
-      - name: Extract version from Cargo.toml
+      - name: Extract version from backend/Cargo.toml
         id: package_version
         run: |
-          VERSION=$(grep -m 1 '^version = ' Cargo.toml | cut -d '"' -f 2)
+          VERSION=$(grep -m 1 '^version = ' backend/Cargo.toml | cut -d '"' -f 2)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 

@@ -14,6 +14,7 @@ RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4
     mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
 
 COPY . .
+WORKDIR /app/frontend
 RUN trunk --version
 RUN tailwindcss --help
 RUN trunk build --release
@@ -23,7 +24,7 @@ FROM rust:latest AS backend_builder
 WORKDIR /app
 COPY . .
 # Copy built static files from frontend stage into dist
-COPY --from=frontend_builder /app/dist /app/dist
+COPY --from=frontend_builder /app/frontend/dist /app/dist
 RUN cargo build --release --bin server
 
 # Stage 3: Slim Runner
@@ -33,7 +34,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 # Copy compiled server binary and compiled static assets
 COPY --from=backend_builder /app/target/release/server /app/server
-COPY --from=frontend_builder /app/dist /app/dist
+COPY --from=frontend_builder /app/frontend/dist /app/dist
 
 # Run as non-root user for security
 RUN groupadd -g 10001 appgroup && \

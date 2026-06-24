@@ -51,6 +51,38 @@ pub fn app() -> Html {
 
     let state = use_reducer(move || AppState::new(solution, is_latest_game, *prefers_dark));
 
+    let is_pin_required = use_state(|| false);
+
+    {
+        let is_pin_required = is_pin_required.clone();
+        use_effect_with((), move |_| {
+            wasm_bindgen_futures::spawn_local(async move {
+                if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required").send().await {
+                    if let Ok(json) = resp.json::<serde_json::Value>().await {
+                        if let Some(req) = json.get("required").and_then(|v| v.as_bool()) {
+                            is_pin_required.set(req);
+                        }
+                    }
+                }
+            });
+            || ()
+        });
+    }
+
+    let on_logout = {
+        Callback::from(move |_| {
+            wasm_bindgen_futures::spawn_local(async move {
+                if let Ok(resp) = gloo_net::http::Request::post("/api/logout").send().await {
+                    if resp.ok() {
+                        if let Some(win) = web_sys::window() {
+                            let _ = win.location().reload();
+                        }
+                    }
+                }
+            });
+        })
+    };
+
     let show_alert = {
         let state = state.clone();
         Callback::from(move |(msg, variant, duration_ms): (String, String, u32)| {
@@ -155,6 +187,8 @@ pub fn app() -> Html {
                 on_hard_mode_click={on_hard_mode_click}
                 theme={state.theme.clone()}
                 on_theme_click={on_theme_click}
+                is_pin_required={*is_pin_required}
+                on_logout={on_logout}
             />
             <Alert message={state.alert_msg.clone()} is_visible={state.alert_visible} variant={state.alert_variant.clone()} />
             <div class="mx-auto flex w-full max-w-7xl flex-grow flex-col px-1 py-1 sm:py-2 sm:px-6 lg:px-8">
