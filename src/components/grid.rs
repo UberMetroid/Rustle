@@ -175,7 +175,7 @@ pub fn grid(props: &GridProps) -> Html {
     let empties_count = (MAX_CHALLENGES - 1).saturating_sub(guesses_len);
 
     html! {
-        <div class="flex-grow flex flex-col justify-center pb-1 sm:pb-2">
+        <div class="flex flex-col justify-center pb-1 sm:pb-2">
             {for props.guesses.iter().enumerate().map(|(i, g)| {
                 html! {
                     <CompletedRow
