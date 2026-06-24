@@ -25,7 +25,8 @@ pub fn translations() -> Translations {
         success_rate: "胜率",
         current_streak: "当前连续",
         best_streak: "最佳连续",
-        discourage_browser: "您正在使用内置浏览器，分享或保存结果时可能会遇到问题。我们建议您使用默认浏览器。",
+        discourage_browser:
+            "您正在使用内置浏览器，分享或保存结果时可能会遇到问题。我们建议您使用默认浏览器。",
         datepicker_title: "选择过去的日期",
         datepicker_choose: "选择",
         logout: "登出",

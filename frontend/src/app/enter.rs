@@ -16,9 +16,7 @@
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::app_state::{Action, AppState};
-use crate::constants::config::{
-    ALERT_TIME_MS, LONG_ALERT_TIME_MS, MAX_CHALLENGES, REVEAL_TIME_MS,
-};
+use crate::constants::config::{ALERT_TIME_MS, LONG_ALERT_TIME_MS, MAX_CHALLENGES, REVEAL_TIME_MS};
 use yew::prelude::*;
 
 pub fn build_on_enter(
@@ -125,11 +123,7 @@ pub fn build_on_enter(
             let i18n_clone = i18n.clone();
             gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * (sol_len as u32 + 1), move || {
                 let msg = crate::i18n::get_correct_word_message(i18n_clone.language, solution);
-                show_alert_clone.emit((
-                    msg,
-                    "error".to_string(),
-                    LONG_ALERT_TIME_MS,
-                ));
+                show_alert_clone.emit((msg, "error".to_string(), LONG_ALERT_TIME_MS));
                 state_lost.dispatch(Action::SetStatsOpen(true));
             })
             .forget();

@@ -60,14 +60,21 @@ pub fn app() -> Html {
         let enable_translation = enable_translation.clone();
         use_effect_with((), move |_| {
             wasm_bindgen_futures::spawn_local(async move {
-                if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required").send().await {
+                if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required")
+                    .send()
+                    .await
+                {
                     if let Ok(json) = resp.json::<serde_json::Value>().await {
                         if let Some(req) = json.get("required").and_then(|v| v.as_bool()) {
                             is_pin_required.set(req);
                         }
-                        if let Some(trans) = json.get("enable_translation").and_then(|v| v.as_bool()) {
+                        if let Some(trans) =
+                            json.get("enable_translation").and_then(|v| v.as_bool())
+                        {
                             enable_translation.set(trans);
-                        } else if let Some(trans) = json.get("enableTranslation").and_then(|v| v.as_bool()) {
+                        } else if let Some(trans) =
+                            json.get("enableTranslation").and_then(|v| v.as_bool())
+                        {
                             enable_translation.set(trans);
                         }
                     }
@@ -139,8 +146,13 @@ pub fn app() -> Html {
         translations: crate::i18n::get_translations(*language_state),
     };
 
-    let on_enter =
-        enter::build_on_enter(state.clone(), show_alert.clone(), solution, is_latest_game, i18n_context.clone());
+    let on_enter = enter::build_on_enter(
+        state.clone(),
+        show_alert.clone(),
+        solution,
+        is_latest_game,
+        i18n_context.clone(),
+    );
 
     let on_theme_click = {
         let state = state.clone();
@@ -199,8 +211,6 @@ pub fn app() -> Html {
             }
         })
     };
-
-
 
     html! {
         <ContextProvider<crate::i18n::I18nContext> context={i18n_context}>

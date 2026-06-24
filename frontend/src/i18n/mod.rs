@@ -171,7 +171,7 @@ pub fn get_saved_language() -> Language {
 }
 
 pub fn save_language(lang: Language) {
-    let _ = StorageService::set_item("language", lang.code());
+    StorageService::set_item("language", lang.code());
 }
 
 #[derive(Clone, PartialEq)]

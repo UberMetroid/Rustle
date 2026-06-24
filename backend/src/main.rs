@@ -20,7 +20,10 @@ use axum::{
 use std::net::SocketAddr;
 use tower_http::services::{ServeDir, ServeFile};
 
-use auth::{auth_check, auth_middleware, logout, pin_required, verify_pin, AppState, security_headers_middleware};
+use auth::{
+    auth_check, auth_middleware, logout, pin_required, security_headers_middleware, verify_pin,
+    AppState,
+};
 use handlers::{serve_asset_manifest, serve_index, serve_service_worker};
 
 #[tokio::main]

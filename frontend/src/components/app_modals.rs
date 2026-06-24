@@ -64,11 +64,7 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
         let show_alert = show_alert.clone();
         let share_fail_msg = translations.share_failure.to_string();
         Callback::from(move |_| {
-            show_alert.emit((
-                share_fail_msg.clone(),
-                "error".to_string(),
-                ALERT_TIME_MS,
-            ))
+            show_alert.emit((share_fail_msg.clone(), "error".to_string(), ALERT_TIME_MS))
         })
     };
 

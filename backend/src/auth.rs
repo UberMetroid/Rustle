@@ -24,8 +24,8 @@ use axum::{
 };
 use serde::Deserialize;
 use serde_json::json;
-use std::net::SocketAddr;
 use std::collections::HashMap;
+use std::net::SocketAddr;
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
@@ -211,7 +211,7 @@ pub async fn verify_pin(
             header::HeaderValue::from_str(&format!(
                 "RUSTLE_PIN={}; Path=/; HttpOnly; SameSite=Strict",
                 hash_pin(pin_str)
-               ))
+            ))
             .unwrap(),
         );
         (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response()
@@ -265,7 +265,9 @@ pub async fn logout() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
     headers.insert(
         header::SET_COOKIE,
-        header::HeaderValue::from_static("RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"),
+        header::HeaderValue::from_static(
+            "RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
+        ),
     );
     (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response()
 }
@@ -335,25 +337,31 @@ pub fn hash_pin(pin: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(pin.as_bytes());
     let result = hasher.finalize();
-    result.iter().map(|b| format!("{:02x}", b)).collect::<String>()
+    result
+        .iter()
+        .map(|b| format!("{:02x}", b))
+        .collect::<String>()
 }
 
-pub async fn security_headers_middleware(
-    req: axum::extract::Request,
-    next: Next,
-) -> Response {
+pub async fn security_headers_middleware(req: axum::extract::Request, next: Next) -> Response {
     let mut response = next.run(req).await;
     let headers = response.headers_mut();
-    
+
     headers.insert("X-Frame-Options", header::HeaderValue::from_static("DENY"));
-    headers.insert("X-Content-Type-Options", header::HeaderValue::from_static("nosniff"));
-    headers.insert("Referrer-Policy", header::HeaderValue::from_static("strict-origin-when-cross-origin"));
+    headers.insert(
+        "X-Content-Type-Options",
+        header::HeaderValue::from_static("nosniff"),
+    );
+    headers.insert(
+        "Referrer-Policy",
+        header::HeaderValue::from_static("strict-origin-when-cross-origin"),
+    );
     headers.insert(
         "Content-Security-Policy", 
         header::HeaderValue::from_static(
             "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob: https:; connect-src 'self' ws: wss: http: https:; font-src 'self'; manifest-src 'self';"
         )
     );
-    
+
     response
 }
