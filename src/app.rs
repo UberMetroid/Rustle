@@ -195,18 +195,27 @@ pub fn app() -> Html {
     let on_theme_click = {
         let state = state.clone();
         Callback::from(move |_| {
-            let next_theme = match state.theme.as_str() {
-                "crateria" => "brinstar",
-                "brinstar" => "norfair",
-                "norfair" => "wrecked_ship",
-                "wrecked_ship" => "maridia",
-                "maridia" => "tourian",
-                _ => "crateria",
+            let date = crate::helpers::words::get_game_date();
+            let next_theme = if let Some((prefix, _)) = crate::helpers::holidays::get_holiday_for_date(date) {
+                if state.theme.ends_with("-light") {
+                    format!("{}-dark", prefix)
+                } else {
+                    format!("{}-light", prefix)
+                }
+            } else {
+                match state.theme.as_str() {
+                    "crateria" => "brinstar".to_string(),
+                    "brinstar" => "norfair".to_string(),
+                    "norfair" => "wrecked_ship".to_string(),
+                    "wrecked_ship" => "maridia".to_string(),
+                    "maridia" => "tourian".to_string(),
+                    _ => "crateria".to_string(),
+                }
             };
-            state.dispatch(Action::SetTheme(next_theme.to_string()));
+            state.dispatch(Action::SetTheme(next_theme.clone()));
             crate::helpers::local_storage::save_preferences_to_local_storage(
                 &crate::helpers::local_storage::StoredPreferences {
-                    theme: next_theme.to_string(),
+                    theme: next_theme,
                     is_hard_mode: state.is_hard_mode,
                 },
             );

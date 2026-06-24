@@ -166,7 +166,9 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
             t => t.to_string(),
         };
         let is_hard_mode = legacy.is_hard_mode.unwrap_or(false);
-        return StoredPreferences { theme, is_hard_mode };
+        let mut prefs = StoredPreferences { theme, is_hard_mode };
+        migrate_holiday_theme(&mut prefs);
+        return prefs;
     }
 
     #[allow(unused_mut)]
@@ -191,8 +193,25 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
             }
         }
     }
-    StoredPreferences {
+    let mut prefs = StoredPreferences {
         theme,
         is_hard_mode,
+    };
+
+    migrate_holiday_theme(&mut prefs);
+    prefs
+}
+
+fn migrate_holiday_theme(prefs: &mut StoredPreferences) {
+    let date = crate::helpers::words::get_game_date();
+    let holiday_info = crate::helpers::holidays::get_holiday_for_date(date);
+    if let Some((prefix, _)) = holiday_info {
+        if !crate::helpers::holidays::is_holiday_theme(&prefs.theme) {
+            let is_light = prefs.theme == "brinstar" || prefs.theme == "maridia" || prefs.theme.ends_with("-light");
+            prefs.theme = format!("{}-{}", prefix, if is_light { "light" } else { "dark" });
+        }
+    } else if crate::helpers::holidays::is_holiday_theme(&prefs.theme) {
+        let is_light = prefs.theme.ends_with("-light");
+        prefs.theme = if is_light { "brinstar".to_string() } else { "crateria".to_string() };
     }
 }

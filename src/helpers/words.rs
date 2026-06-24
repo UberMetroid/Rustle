@@ -106,6 +106,7 @@ pub fn get_game_date() -> NaiveDate {
     // If we have ENABLE_ARCHIVED_GAMES, we can read '?d=' query parameter.
     // However, since it is false by default, we just return today.
     // Let's implement query param parsing in case.
+    #[cfg(target_arch = "wasm32")]
     if let Some(win) = web_sys::window() {
         if let Ok(search) = win.location().search() {
             if let Some(date_str) = search.strip_prefix("?d=") {
@@ -121,7 +122,9 @@ pub fn get_game_date() -> NaiveDate {
     get_today()
 }
 
+#[allow(unused_variables)]
 pub fn set_game_date(d: NaiveDate) {
+    #[cfg(target_arch = "wasm32")]
     if let Some(win) = web_sys::window() {
         let today = get_today();
         if d < today {

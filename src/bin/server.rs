@@ -471,17 +471,32 @@ mod native_server {
         let duration = game_date.signed_duration_since(first_game_date);
         let puzzle_index = duration.num_days() as i32;
 
+        let holiday_info = get_holiday_for_date(game_date);
+
         let is_today = game_date == chrono::Local::now().date_naive();
-        let display_title = if is_today {
+        let display_title = if let Some((_, holiday_name)) = holiday_info {
+            if is_today {
+                format!("{} #{} - Special {} Edition!", state.site_title, puzzle_index, holiday_name)
+            } else {
+                format!("{} #{} ({} Archive)", state.site_title, puzzle_index, holiday_name)
+            }
+        } else if is_today {
             format!("{} #{}", state.site_title, puzzle_index)
         } else {
             format!("{} #{} (Archive - {})", state.site_title, puzzle_index, game_date.format("%Y-%m-%d"))
         };
 
-        let display_description = format!(
-            "Play {} #{}: Can you guess the secret 5-letter word in 6 attempts? Solve the daily puzzle using Metroid themes, dark mode, and responsive layouts.",
-            state.site_title, puzzle_index
-        );
+        let display_description = if let Some((_, holiday_name)) = holiday_info {
+            format!(
+                "Play {} #{}: Celebrate {} with this special edition 5-letter word puzzle! Solve it using custom holiday theme colors.",
+                state.site_title, puzzle_index, holiday_name
+            )
+        } else {
+            format!(
+                "Play {} #{}: Can you guess the secret 5-letter word in 6 attempts? Solve the daily puzzle using Metroid themes, dark mode, and responsive layouts.",
+                state.site_title, puzzle_index
+            )
+        };
 
         // Serve the normal index.html with title and metadata replaced
         let path = std::path::Path::new("dist/index.html");
@@ -653,6 +668,82 @@ mod native_server {
             Ok(bytes) => ([(header::CONTENT_TYPE, content_type)], bytes).into_response(),
             Err(_) => StatusCode::NOT_FOUND.into_response(),
         }
+    }
+
+    // Holiday detection helpers for server rendering
+    fn get_holiday_for_date(date: chrono::NaiveDate) -> Option<(&'static str, &'static str)> {
+        use chrono::Datelike;
+        let year = date.year();
+        let month = date.month();
+        let day = date.day();
+
+        if (month == 12 && day == 31) || (month == 1 && day == 1) {
+            return Some(("newyear", "New Year's"));
+        }
+        if month == 2 && (12..=14).contains(&day) {
+            return Some(("valentine", "Valentine's Day"));
+        }
+        if month == 3 && (15..=17).contains(&day) {
+            return Some(("stpatrick", "St. Patrick's Day"));
+        }
+        let easter = get_easter_sunday(year);
+        if let (Some(good_friday), Some(easter_monday)) = (
+            easter.checked_sub_signed(chrono::Duration::days(2)),
+            easter.checked_add_signed(chrono::Duration::days(1)),
+        ) {
+            if date >= good_friday && date <= easter_monday {
+                return Some(("easter", "Easter"));
+            }
+        }
+        if month == 7 && (3..=5).contains(&day) {
+            return Some(("independence", "Independence Day"));
+        }
+        if month == 10 && (25..=31).contains(&day) {
+            return Some(("halloween", "Halloween"));
+        }
+        let thanksgiving = get_thanksgiving_thursday(year);
+        if let Some(thanksgiving_sunday) = thanksgiving.checked_add_signed(chrono::Duration::days(3)) {
+            if date >= thanksgiving && date <= thanksgiving_sunday {
+                return Some(("thanksgiving", "Thanksgiving"));
+            }
+        }
+        if month == 12 && (20..=26).contains(&day) {
+            return Some(("christmas", "Christmas"));
+        }
+        None
+    }
+
+    fn get_easter_sunday(year: i32) -> chrono::NaiveDate {
+        let a = year % 19;
+        let b = year / 100;
+        let c = year % 100;
+        let d = b / 4;
+        let e = b % 4;
+        let f = (b + 8) / 25;
+        let g = (b - f + 1) / 3;
+        let h = (19 * a + b - d - g + 15) % 30;
+        let i = c / 4;
+        let k = c % 4;
+        let l = (32 + 2 * e + 2 * i - h - k) % 7;
+        let m = (a + 11 * h + 22 * l) / 451;
+        let month = ((h + l - 7 * m + 114) / 31) as u32;
+        let day = (((h + l - 7 * m + 114) % 31) + 1) as u32;
+        chrono::NaiveDate::from_ymd_opt(year, month, day).unwrap_or_default()
+    }
+
+    fn get_thanksgiving_thursday(year: i32) -> chrono::NaiveDate {
+        use chrono::Datelike;
+        use chrono::Weekday;
+        let first_of_nov = chrono::NaiveDate::from_ymd_opt(year, 11, 1).unwrap_or_default();
+        let mut date = first_of_nov;
+        while date.weekday() != Weekday::Thu {
+            if let Some(next) = date.succ_opt() {
+                date = next;
+            } else {
+                break;
+            }
+        }
+        date + chrono::Duration::days(21)
     }
 }
 
