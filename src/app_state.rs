@@ -59,7 +59,6 @@ pub enum Action {
     SetHardMode(bool),
     SetTheme(String),
     SetEffectsActive(bool),
-    DeactivateEffects,
 }
 
 impl Reducible for AppState {
@@ -123,11 +122,6 @@ impl Reducible for AppState {
             }
             Action::SetEffectsActive(val) => {
                 state.is_effects_active = val;
-            }
-            Action::DeactivateEffects => {
-                if !state.is_game_won {
-                    state.is_effects_active = false;
-                }
             }
         }
         Rc::new(state)
