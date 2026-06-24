@@ -47,9 +47,15 @@ pub fn share_status(
         &get_emoji_tiles(theme),
     );
 
+    let puzzle_num_str = if solution_index < 0 {
+        format!("Beta #{}", solution_index.abs())
+    } else {
+        format!("#{}", solution_index + 1)
+    };
+
     let text_to_share = format!(
         "{} {} {}/{}{}\n\n{}",
-        GAME_TITLE, solution_index, guess_count, MAX_CHALLENGES, hard_indicator, emoji_grid
+        GAME_TITLE, puzzle_num_str, guess_count, MAX_CHALLENGES, hard_indicator, emoji_grid
     );
 
     let mut shared = false;

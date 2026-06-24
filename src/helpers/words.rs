@@ -21,7 +21,7 @@ use crate::helpers::statuses::get_guess_statuses;
 use chrono::{Duration, Local, NaiveDate};
 
 pub fn first_game_date() -> NaiveDate {
-    NaiveDate::from_ymd_opt(2022, 1, 1).unwrap_or_default()
+    NaiveDate::from_ymd_opt(2026, 7, 1).unwrap_or_default()
 }
 
 pub fn get_today() -> NaiveDate {

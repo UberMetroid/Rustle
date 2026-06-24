@@ -467,34 +467,40 @@ mod native_server {
             chrono::Local::now().date_naive()
         };
 
-        let first_game_date = chrono::NaiveDate::from_ymd_opt(2022, 1, 1).unwrap_or_default();
+        let first_game_date = chrono::NaiveDate::from_ymd_opt(2026, 7, 1).unwrap_or_default();
         let duration = game_date.signed_duration_since(first_game_date);
         let puzzle_index = duration.num_days() as i32;
+
+        let puzzle_num_str = if puzzle_index < 0 {
+            format!("Beta #{}", puzzle_index.abs())
+        } else {
+            format!("#{}", puzzle_index + 1)
+        };
 
         let holiday_info = get_holiday_for_date(game_date);
 
         let is_today = game_date == chrono::Local::now().date_naive();
         let display_title = if let Some((_, holiday_name)) = holiday_info {
             if is_today {
-                format!("{} #{} - Special {} Edition!", state.site_title, puzzle_index, holiday_name)
+                format!("{} {} - Special {} Edition!", state.site_title, puzzle_num_str, holiday_name)
             } else {
-                format!("{} #{} ({} Archive)", state.site_title, puzzle_index, holiday_name)
+                format!("{} {} ({} Archive)", state.site_title, puzzle_num_str, holiday_name)
             }
         } else if is_today {
-            format!("{} #{}", state.site_title, puzzle_index)
+            format!("{} {}", state.site_title, puzzle_num_str)
         } else {
-            format!("{} #{} (Archive - {})", state.site_title, puzzle_index, game_date.format("%Y-%m-%d"))
+            format!("{} {} (Archive - {})", state.site_title, puzzle_num_str, game_date.format("%Y-%m-%d"))
         };
 
         let display_description = if let Some((_, holiday_name)) = holiday_info {
             format!(
-                "Play {} #{}: Celebrate {} with this special edition 5-letter word puzzle! Solve it using custom holiday theme colors.",
-                state.site_title, puzzle_index, holiday_name
+                "Play {} {}: Celebrate {} with this special edition 5-letter word puzzle! Solve it using custom holiday theme colors.",
+                state.site_title, puzzle_num_str, holiday_name
             )
         } else {
             format!(
-                "Play {} #{}: Can you guess the secret 5-letter word in 6 attempts? Solve the daily puzzle using Metroid themes, dark mode, and responsive layouts.",
-                state.site_title, puzzle_index
+                "Play {} {}: Can you guess the secret 5-letter word in 6 attempts? Solve the daily puzzle using Metroid themes, dark mode, and responsive layouts.",
+                state.site_title, puzzle_num_str
             )
         };
 

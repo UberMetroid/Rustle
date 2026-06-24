@@ -72,17 +72,39 @@ fn test_is_word_in_word_list() {
 
 #[test]
 fn test_date_indices_and_solutions() {
-    // 2022-01-05 is a non-holiday (New Year's spread is Dec 31 - Jan 1).
-    let test_date = NaiveDate::from_ymd_opt(2022, 1, 5).unwrap();
+    // 2026-07-10 is a non-holiday (Independence Day spread is Jul 3 - Jul 5).
+    let test_date = NaiveDate::from_ymd_opt(2026, 7, 10).unwrap();
     let index = get_index(test_date);
-    assert_eq!(index, 4);
+    assert_eq!(index, 9);
 
-    let word = get_word_of_day(4);
+    let word = get_word_of_day(9);
     assert_eq!(word.len(), 5);
 
     let sol = get_solution(test_date);
     assert_eq!(sol.solution, word);
-    assert_eq!(sol.solution_index, 4);
+    assert_eq!(sol.solution_index, 9);
+}
+
+#[test]
+fn test_beta_indices_and_solutions() {
+    // 2026-06-25 is a beta date (before 2026-07-01), index should be negative.
+    let date_a = NaiveDate::from_ymd_opt(2026, 6, 25).unwrap();
+    let date_b = NaiveDate::from_ymd_opt(2026, 6, 26).unwrap();
+    
+    let index_a = get_index(date_a);
+    let index_b = get_index(date_b);
+    
+    assert!(index_a < 0);
+    assert!(index_b < 0);
+    assert_ne!(index_a, index_b);
+    
+    let word_a = get_word_of_day(index_a);
+    let word_b = get_word_of_day(index_b);
+    
+    assert_eq!(word_a.len(), 5);
+    assert_eq!(word_b.len(), 5);
+    // Verify we get distinct words for distinct negative indices
+    assert_ne!(word_a, word_b);
 }
 
 #[test]

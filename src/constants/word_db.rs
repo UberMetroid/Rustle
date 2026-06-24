@@ -46,7 +46,7 @@ pub fn get_word_of_day(index: i32) -> &'static str {
     let num_words = WORDS.len() / 5;
 
     // Deterministic seeded scrambling step (Linear Congruential Generator step)
-    let seed = index.max(0) as u64;
+    let seed = index as i64 as u64;
     let multiplier: u64 = 6364136223846793005;
     let increment: u64 = 1442695040888963407;
     let scrambled = seed.wrapping_mul(multiplier).wrapping_add(increment);
