@@ -36,6 +36,8 @@ pub struct AppState {
     #[allow(dead_code)]
     pub allowed_origins: String,
     pub enable_translation: bool,
+    pub enable_themes: bool,
+    pub enable_print: bool,
 }
 
 #[derive(Deserialize)]
@@ -156,6 +158,8 @@ pub async fn pin_required(
         "attempts_left": attempts_left,
         "lockout_minutes": lockout_seconds.div_ceil(60),
         "enable_translation": state.enable_translation,
+        "enable_themes": state.enable_themes,
+        "enable_print": state.enable_print,
     }))
 }
 

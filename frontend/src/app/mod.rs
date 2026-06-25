@@ -53,11 +53,16 @@ pub fn app() -> Html {
 
     let is_pin_required = use_state(|| false);
     let enable_translation = use_state(|| false);
+    let enable_themes = use_state(|| true);
+    let enable_print = use_state(|| true);
     let language_state = use_state(crate::i18n::get_saved_language);
-
+ 
     {
         let is_pin_required = is_pin_required.clone();
         let enable_translation = enable_translation.clone();
+        let enable_themes = enable_themes.clone();
+        let enable_print = enable_print.clone();
+        let state = state.clone();
         use_effect_with((), move |_| {
             wasm_bindgen_futures::spawn_local(async move {
                 if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required")
@@ -76,6 +81,33 @@ pub fn app() -> Html {
                             json.get("enableTranslation").and_then(|v| v.as_bool())
                         {
                             enable_translation.set(trans);
+                        }
+
+                        let mut themes_enabled = true;
+                        if let Some(themes) =
+                            json.get("enable_themes").and_then(|v| v.as_bool())
+                        {
+                            themes_enabled = themes;
+                            enable_themes.set(themes);
+                        } else if let Some(themes) =
+                            json.get("enableThemes").and_then(|v| v.as_bool())
+                        {
+                            themes_enabled = themes;
+                            enable_themes.set(themes);
+                        }
+
+                        if !themes_enabled {
+                            state.dispatch(Action::SetTheme("tourian".to_string()));
+                        }
+
+                        if let Some(print) =
+                            json.get("enable_print").and_then(|v| v.as_bool())
+                        {
+                            enable_print.set(print);
+                        } else if let Some(print) =
+                            json.get("enablePrint").and_then(|v| v.as_bool())
+                        {
+                            enable_print.set(print);
                         }
                     }
                 }
@@ -156,7 +188,11 @@ pub fn app() -> Html {
 
     let on_theme_click = {
         let state = state.clone();
+        let enable_themes = enable_themes.clone();
         Callback::from(move |_| {
+            if !*enable_themes {
+                return;
+            }
             let date = crate::helpers::words::get_game_date();
             if crate::helpers::holidays::get_holiday_for_date(date).is_some() {
                 return;
@@ -229,6 +265,8 @@ pub fn app() -> Html {
                     language={*language_state}
                     on_language_change={on_language_change}
                     enable_translation={*enable_translation}
+                    enable_themes={*enable_themes}
+                    enable_print={*enable_print}
                 />
                 <Alert message={state.alert_msg.clone()} is_visible={state.alert_visible} variant={state.alert_variant.clone()} />
                 <div class="mx-auto flex w-full max-w-7xl flex-grow flex-col px-1 py-1 sm:py-2 sm:px-6 lg:px-8">

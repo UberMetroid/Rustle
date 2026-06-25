@@ -32,6 +32,8 @@ pub struct NavbarProps {
     pub language: crate::i18n::Language,
     pub on_language_change: Callback<crate::i18n::Language>,
     pub enable_translation: bool,
+    pub enable_themes: bool,
+    pub enable_print: bool,
 }
 
 #[function_component(Navbar)]
@@ -149,9 +151,15 @@ pub fn navbar(props: &NavbarProps) -> Html {
                     } else {
                         html! {}
                     }}
-                    <button class="mr-3 focus:outline-none" onclick={move |_| theme_click.emit(())} aria-label="Toggle theme">
-                        {theme_toggle_icon}
-                    </button>
+                    {if props.enable_themes {
+                        html! {
+                            <button class="mr-3 focus:outline-none" onclick={move |_| theme_click.emit(())} aria-label="Toggle theme">
+                                {theme_toggle_icon}
+                            </button>
+                        }
+                    } else {
+                        html! {}
+                    }}
                     <button class="focus:outline-none" onclick={move |_| hard_mode_click.emit(())} aria-label="Hard Mode">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 cursor-pointer" width="24" height="24" viewBox="0 0 24 24" fill={if is_hard_mode { "currentColor" } else { "none" }} stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" title="Hard Mode">
                             <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
