@@ -239,6 +239,17 @@ svg.cursor-pointer:hover {
   }
 }
 
+.header-center-toolbar .icon-button:hover svg {
+  color: var(--primary);
+  stroke: var(--primary);
+}
+
+.header-center-toolbar .icon-button.active svg {
+  fill: var(--primary);
+  stroke: var(--primary);
+  color: var(--primary);
+}
+
 @keyframes revealAbsentCharCell {
   0% {
     transform: rotateX(0deg);
