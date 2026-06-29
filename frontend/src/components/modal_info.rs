@@ -37,7 +37,7 @@ pub fn info_modal(props: &InfoModalProps) -> Html {
                 {"Guess the 5-letter word in 6 tries. After each guess, the color of the tiles will change to show how close your guess was to the word."}
             </p>
 
-            <div class="mb-1 mt-4 flex justify-center">
+            <div class="info-modal-row mb-1 mt-4 flex justify-center">
                 <Cell is_revealing=true is_completed=true value={Some('W')} status={Some(CharStatus::Correct)} />
                 <Cell value={Some('E')} is_completed=true />
                 <Cell value={Some('A')} is_completed=true />
@@ -48,7 +48,7 @@ pub fn info_modal(props: &InfoModalProps) -> Html {
                 {"The letter W is in the word and in the correct spot."}
             </p>
 
-            <div class="mb-1 mt-4 flex justify-center">
+            <div class="info-modal-row mb-1 mt-4 flex justify-center">
                 <Cell value={Some('P')} is_completed=true />
                 <Cell value={Some('I')} is_completed=true />
                 <Cell is_revealing=true is_completed=true value={Some('L')} status={Some(CharStatus::Present)} />
@@ -59,7 +59,7 @@ pub fn info_modal(props: &InfoModalProps) -> Html {
                 {"The letter L is in the word but in the wrong spot."}
             </p>
 
-            <div class="mb-1 mt-4 flex justify-center">
+            <div class="info-modal-row mb-1 mt-4 flex justify-center">
                 <Cell value={Some('V')} is_completed=true />
                 <Cell value={Some('A')} is_completed=true />
                 <Cell value={Some('G')} is_completed=true />
