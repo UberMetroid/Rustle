@@ -502,10 +502,10 @@ header {
 
 /* Grid Cell styling */
 .cell {
-  width: min(8dvh, 14vw);
-  height: min(8dvh, 14vw);
-  max-width: 66px;
-  max-height: 66px;
+  width: min(9dvh, 15vw);
+  height: min(9dvh, 15vw);
+  max-width: 90px;
+  max-height: 90px;
   background-color: var(--default-cell-bg-color) !important;
   border-color: var(--default-cell-border-color) !important;
   color: var(--default-cell-text-color) !important;
@@ -516,7 +516,7 @@ header {
   margin: 0 0.125rem;
   font-weight: 700;
   border-radius: 4px;
-  font-size: min(4.2dvh, 2rem);
+  font-size: min(4.8dvh, 2.5rem);
 }
 
 .cell-filled {
@@ -543,8 +543,8 @@ header {
 
 /* Keyboard Key styling */
 .key-btn {
-  height: min(6.5dvh, 12vw);
-  max-height: 62px;
+  height: min(7.5dvh, 13vw);
+  max-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -554,18 +554,18 @@ header {
   cursor: pointer;
   user-select: none;
   transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
-  font-size: min(2.5dvh, 1.25rem);
+  font-size: min(3dvh, 1.5rem);
 }
 
 .key-btn.regular-key {
-  width: min(5.4dvh, 10vw);
-  max-width: 52px;
+  width: min(6.2dvh, 11vw);
+  max-width: 65px;
 }
 
 .key-btn.special-key {
-  width: min(9dvh, 16vw);
-  max-width: 82px;
-  font-size: min(2.0dvh, 0.95rem);
+  width: min(10dvh, 17vw);
+  max-width: 110px;
+  font-size: min(2.4dvh, 1.15rem);
 }
 
 .key-default {
