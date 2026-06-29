@@ -214,7 +214,7 @@ svg.cursor-pointer:hover {
 }
 
 .header-center-toolbar {
-  position: fixed;
+  position: absolute;
   left: 50%;
   top: 0;
   transform: translateX(-50%);
@@ -466,6 +466,8 @@ svg.cursor-pointer:hover {
 .app-container {
   background-color: var(--bg-color) !important;
   color: var(--text-color) !important;
+  height: 100dvh;
+  overflow: hidden !important;
 }
 
 /* Base body background override */
@@ -497,15 +499,29 @@ header {
 }
 
 #game-grid {
-  margin-top: min(2dvh, 0.5rem) !important;
+  display: flex;
+  flex-direction: column;
+  height: min(48dvh, 480px);
+  aspect-ratio: 5 / 6;
+  margin-top: min(1.5dvh, 0.5rem) !important;
+  margin-bottom: min(1.5dvh, 0.5rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100%;
+}
+
+#game-grid > div {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: min(0.6dvh, 4px);
+  min-height: 0;
 }
 
 /* Grid Cell styling */
 .cell {
-  width: min(9dvh, 15vw);
-  height: min(9dvh, 15vw);
-  max-width: 90px;
-  max-height: 90px;
+  height: 100%;
+  aspect-ratio: 1 / 1;
   background-color: var(--default-cell-bg-color) !important;
   border-color: var(--default-cell-border-color) !important;
   color: var(--default-cell-text-color) !important;
@@ -513,10 +529,11 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 0.125rem;
+  margin: 0 min(0.4dvh, 3px);
   font-weight: 700;
   border-radius: 4px;
-  font-size: min(4.8dvh, 2.5rem);
+  font-size: min(4.2dvh, 2.25rem);
+  box-sizing: border-box;
 }
 
 .cell-filled {
@@ -541,31 +558,49 @@ header {
   color: var(--key-state-text) !important;
 }
 
+.keyboard-container {
+  height: min(22dvh, 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 auto;
+  width: 100%;
+  max-width: min(600px, 95vw);
+}
+
+.keyboard-container > div {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: min(0.5dvh, 4px);
+  height: 100%;
+  min-height: 0;
+}
+
 /* Keyboard Key styling */
 .key-btn {
-  height: min(7.5dvh, 13vw);
-  max-height: 80px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  margin: 0 1.5px;
+  margin: 0 min(0.4dvh, 3px);
   font-weight: 700;
   cursor: pointer;
   user-select: none;
   transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
-  font-size: min(3dvh, 1.5rem);
+  font-size: min(2.8dvh, 1.25rem);
 }
 
 .key-btn.regular-key {
-  width: min(6.2dvh, 11vw);
-  max-width: 65px;
+  flex: 1;
+  max-width: 58px;
 }
 
 .key-btn.special-key {
-  width: min(10dvh, 17vw);
-  max-width: 110px;
-  font-size: min(2.4dvh, 1.15rem);
+  flex: 1.5;
+  max-width: 96px;
+  font-size: min(2.2dvh, 1rem);
 }
 
 .key-default {
