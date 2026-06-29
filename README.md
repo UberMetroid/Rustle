@@ -1,7 +1,7 @@
 # Rustle - Wordle Clone in Rust & WebAssembly
 
 <p align="center">
-  <img src="frontend/public/favicon.png?v=0.1.25" alt="Rustle Logo" width="128" height="128">
+  <img src="frontend/public/favicon.png?v=0.1.26" alt="Rustle Logo" width="128" height="128">
 </p>
 
 Rustle is an optimized, responsive, and secure clone of the popular Wordle game built using Rust, Yew, and WebAssembly, served by a native Axum backend.
@@ -18,7 +18,7 @@ Rustle is an optimized, responsive, and secure clone of the popular Wordle game 
 version: '3'
 services:
   rustle:
-    image: ubermetroid/rustle:0.1.25
+    image: ubermetroid/rustle:0.1.26
     container_name: rustle
     restart: unless-stopped
     ports:
@@ -52,7 +52,7 @@ docker run -d \
   -e SITE_TITLE=Rustle \
   -e BASE_URL=http://localhost:4409 \
   -e ALLOWED_ORIGINS="*" \
-  ubermetroid/rustle:0.1.25
+  ubermetroid/rustle:0.1.26
 ```
 
 ---
